@@ -23,8 +23,11 @@ uses
 
 type
   TTestForm = class(TForm)
+    Panel: TPanel;
     cmdTest: TButton;
+    cmdException: TButton;
     procedure cmdTestClick(Sender: TObject);
+    procedure cmdExceptionClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -39,7 +42,8 @@ implementation
 uses
 	System.IOUtils,
 	Posix.Proc,
-	Posix.Backtrace;
+	Posix.Backtrace,
+	Posix.ExceptionUtil;
 
 {$R *.fmx}
 
@@ -85,7 +89,6 @@ begin
 		ProcList.Free;
 	end;
 {$ENDIF}
-	//raise Exception.Create('Error Message');
 end;
 
 
@@ -118,6 +121,28 @@ end;
 procedure TObj.Test;
 begin
 	SomeFunc1(1);
+end;
+
+{ TTestForm }
+
+procedure TTestForm.cmdExceptionClick(Sender: TObject);
+var s	: string;
+	st	: TStrings;
+begin
+	TExceptionStackInfo.Attach;
+	try
+		raise Exception.Create('Error Message');
+	except
+		on E : Exception do begin
+			s:=E.StackTrace;
+			s:=E.ClassName + ': ' + E.Message + #$A + s;
+			st:=TStringList.Create;
+			st.Text:=s;
+			st.SaveToFile(TPath.Combine(TPath.GetSharedDocumentsPath, 'exc.txt'));
+			st.Free;
+			MessageDlg(s, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+		end;
+	end;
 end;
 
 procedure TTestForm.cmdTestClick(Sender: TObject);

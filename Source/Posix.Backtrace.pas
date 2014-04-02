@@ -75,6 +75,7 @@ function backtrace(buffer : PPointer; size : Integer) : Integer; inline;
 begin
 	Result:=StackWalk(buffer, size);
 end;
+
 {$ENDIF CPUARM}
 
 end.

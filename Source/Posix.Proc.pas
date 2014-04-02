@@ -61,6 +61,9 @@ type
 		///    Return symbol address and file name
 		///</summary>
 		function GetStackLine(const Address : NativeUInt) : string;
+		///<summary>
+        ///    Convert stack trace to human and addr2line readable format
+        ///</summary>
 		function ConvertStackTrace(Stack : PPointer; Offset, Count : Integer) : string;
 	end;
 

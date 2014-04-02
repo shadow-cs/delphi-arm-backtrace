@@ -21,7 +21,8 @@ uses
   FMX.Forms,
   BacktraceTest in '..\..\Tests\BacktraceTest.pas' {TestForm},
   Posix.Backtrace in '..\..\Source\Posix.Backtrace.pas',
-  Posix.Proc in '..\..\Source\Posix.Proc.pas';
+  Posix.Proc in '..\..\Source\Posix.Proc.pas',
+  Posix.ExceptionUtil in '..\..\Source\Posix.ExceptionUtil.pas';
 
 {$R *.res}
 
