@@ -1,0 +1,24 @@
+﻿0x00AC5AC6 (0x75A48AC6) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00AC5E90 (0x75A48E90) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00AC5EA8 (0x75A48EA8) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00AC5EC0 (0x75A48EC0) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00AC5A60 (0x75A48A60) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x009EF360 (0x75972360) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x000022E9 (0x400B52E9) {Not executable} /system/lib/libc.so
+0x009EFA64 (0x75972A64) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x009E937E (0x7596C37E) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00A849BC (0x75A079BC) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x0094C45E (0x758CF45E) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x000022E9 (0x400B52E9) {Not executable} /system/lib/libc.so
+0x009655F6 (0x758E85F6) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00951646 (0x758D4646) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x0095E886 (0x758E1886) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x005C56C2 (0x755486C2) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x0096576C (0x758E876C) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x000022E9 (0x400B52E9) {Not executable} /system/lib/libc.so
+0x00950AA4 (0x758D3AA4) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00950A88 (0x758D3A88) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00A7C7E0 (0x759FF7E0) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00AC5FA0 (0x75A48FA0) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x00277BF0 (0x751FABF0) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
+0x0000D171 (0x40076171) /system/lib/libc.so
