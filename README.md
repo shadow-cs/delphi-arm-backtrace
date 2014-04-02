@@ -35,14 +35,16 @@ The result will look like this:
 
 Known issues
 ------------
- * There are no unit tests right now as this project is currently in proof of concept state.
- * Only tested on Android, no iOS support right now.
+ * There are no unit tests right now as this project is currently in proof of
+   concept state.
+ * Only tested on Android (Nexus 7, let me know if it works on your device),
+   no iOS support right now (patches welcome ;-) ).
 
 TODO
 ----
 iOS support. On iOS we may not need to open /proc/self/maps as there is only one
 executable so reading base address from elf might be enough. Returning symbols
-and line numbers from XCcode is another question.
+and line numbers from XCode is another question.
 
 License
 -------
