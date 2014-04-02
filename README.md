@@ -16,6 +16,7 @@ Feed the generated lines to addr2line to get symbolic function names and line
 information. (See PrintLines.bat how to do that.)
 
 The result will look like this:
+
 	0x00AC5AC6 (0x75A48AC6) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
 	_ZN13Backtracetest9SomeFunc2Ei at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:57
 	0x00AC5E90 (0x75A48E90) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
