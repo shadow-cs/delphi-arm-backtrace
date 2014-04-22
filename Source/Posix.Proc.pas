@@ -23,6 +23,9 @@ uses
 	System.Classes,
 	System.Generics.Defaults,
 	System.Generics.Collections,
+{$IFDEF MACOS}
+	Macapi.CoreFoundation,
+{$ENDIF}
 	System.RegularExpressions;
 
 type

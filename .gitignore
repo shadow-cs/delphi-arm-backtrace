@@ -7,3 +7,8 @@ Proj/DelphiXE5/Win32/
 Proj/DelphiXE5/a.out
 Proj/DelphiXE5/BacktraceTestProj.dsk
 Proj/DelphiXE5/BacktraceTestProj.identcache
+Proj/DelphiXE5/OSX32/
+Proj/DelphiXE5/iOSDevice/
+Proj/DelphiXE5/iOSSimulator/
+Proj/DelphiXE5/BacktraceGroup.groupproj.local
+*.~dsk

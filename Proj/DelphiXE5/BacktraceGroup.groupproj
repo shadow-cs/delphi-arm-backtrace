@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{82703257-197D-4129-98C6-1CDFDE95D3AE}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="BacktraceTestProj.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BacktraceConsoleTestProj.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BacktraceTestProj">
+        <MSBuild Projects="BacktraceTestProj.dproj"/>
+    </Target>
+    <Target Name="BacktraceTestProj:Clean">
+        <MSBuild Projects="BacktraceTestProj.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BacktraceTestProj:Make">
+        <MSBuild Projects="BacktraceTestProj.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BacktraceConsoleTestProj">
+        <MSBuild Projects="BacktraceConsoleTestProj.dproj"/>
+    </Target>
+    <Target Name="BacktraceConsoleTestProj:Clean">
+        <MSBuild Projects="BacktraceConsoleTestProj.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BacktraceConsoleTestProj:Make">
+        <MSBuild Projects="BacktraceConsoleTestProj.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BacktraceTestProj;BacktraceConsoleTestProj"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BacktraceTestProj:Clean;BacktraceConsoleTestProj:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BacktraceTestProj:Make;BacktraceConsoleTestProj:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
