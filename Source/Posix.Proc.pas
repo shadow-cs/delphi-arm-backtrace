@@ -57,6 +57,15 @@ type
     constructor Create;
     procedure LoadFromStrings(const Str : TStrings);
 {$IFDEF POSIX}
+    /// <summary>
+    ///   Loads content from current <c>proc/self/maps</c> pseudo-file. But
+    ///   keep in mind that the contents of this file may mutate during runtime
+    ///   and the result is only safe to use on parts of memory that doe not
+    ///   change. If the paged change and thus this file also changes some
+    ///   pages may not be present in the already parsed result (this is
+    ///   totally OK if you only need to see code pages in the result, but if
+    ///   you need to track virtual memory, it may lead to issues).
+    /// </summary>
     procedure LoadFromCurrentProcess;
 {$ENDIF}
     function FindEntry(const Address : NativeUInt) : PPosixProcEntry;
