@@ -1,5 +1,9 @@
 Delphi ARM Backtrace library
 ============================
+
+This is a repository clone of the Delphi ARM Backtrace library for Delphinus-Support
+- original repository https://bitbucket.org/shadow_cs/delphi-arm-backtrace
+
 This is a simple library that allows you to create a stack trace and transform
 it into format that can be fed to addr2line to convert it to function/line no.
 information.

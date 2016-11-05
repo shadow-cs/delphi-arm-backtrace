@@ -1,0 +1,17 @@
+{
+  "search_pathes": [{
+    "pathes": "Source",
+    "platforms": "Win32;Win64;OSX32"
+  }
+  ],
+  "source_folders": [{
+    "folder": ".",
+    "filter": "License.txt"
+  },
+  {
+    "folder": "Source"
+  },
+  {
+    "folder": "Tests"
+  }]
+}
