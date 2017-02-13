@@ -17,6 +17,8 @@ unit Posix.Proc;
 
 interface
 
+{$LEGACYIFEND ON}
+
 uses
   System.SysUtils,
   System.Math,
@@ -32,13 +34,22 @@ uses
   System.RegularExpressions;
 
 type
+  // Define a custom integer and allow compile-time selection of its size.
+  // Use autodetection by default.
+{$IF Defined(POSIX_PROC_32)}
+  PosixProcInt = UInt32;
+{$ELSEIF Defined(POSIX_PROC_64)}
+  PosixProcInt = UInt64;
+{$ELSE}
+  PosixProcInt = NativeUInt;
+{$IFEND}
   TPosixProcFormat = (ppfProc, ppfVmmap);
   TPosixProcEntryPermissions = set of (peRead, peWrite, peExecute, peShared,
     pePrivate {copy on write});
 
   TPosixProcEntry = record
     RangeStart,
-    RangeEnd: NativeUInt;
+    RangeEnd: PosixProcInt;
     Perms: TPosixProcEntryPermissions;
     Path: string;
   end;
@@ -60,6 +71,7 @@ type
     FList: TArray<TPosixProcEntry>;
   protected
     function ProcessLine(const Line : string; out Entry : TPosixProcEntry) : Boolean;
+    class function StrToPosixProcInt(const s: string): PosixProcInt; static;
   public
     constructor Create(Format: TPosixProcFormat = DefaultFormat);
     procedure LoadFromStrings(const Str : TStrings);
@@ -75,14 +87,14 @@ type
     /// </summary>
     procedure LoadFromCurrentProcess;
 {$ENDIF}
-    function FindEntry(const Address : NativeUInt) : PPosixProcEntry;
-    ///<summary>
-    ///    Return symbol address and file name
-    ///</summary>
-    function GetStackLine(const Address : NativeUInt) : string;
-    ///<summary>
-        ///    Convert stack trace to human and addr2line readable format
-        ///</summary>
+    function FindEntry(const Address : PosixProcInt) : PPosixProcEntry;
+    /// <summary>
+    ///   Return symbol address and file name
+    /// </summary>
+    function GetStackLine(const Address : PosixProcInt) : string;
+    /// <summary>
+    ///   Convert stack trace to human and addr2line readable format
+    /// </summary>
     function ConvertStackTrace(Stack : PPointer; Offset, Count : Integer) : string;
   end;
 
@@ -153,7 +165,7 @@ begin
   end;
   while Count > 0 do
   begin
-    Result := Result + GetStackLine(NativeUInt(Stack^)) + sLineBreak;
+    Result := Result + GetStackLine(PosixProcInt(Stack^)) + sLineBreak;
     Inc(Stack);
     Dec(Count);
   end;
@@ -182,7 +194,7 @@ begin
 end;
 
 function TPosixProcEntryList.FindEntry(
-  const Address: NativeUInt): PPosixProcEntry;
+  const Address: PosixProcInt): PPosixProcEntry;
 var
   Token: TPosixProcEntry;
   Index: Integer;
@@ -199,8 +211,8 @@ begin
     Result := nil;
 end;
 
-function TPosixProcEntryList.GetStackLine(const Address: NativeUInt): string;
-const CHARS = sizeof(NativeInt) * 2;
+function TPosixProcEntryList.GetStackLine(const Address: PosixProcInt): string;
+const CHARS = sizeof(PosixProcInt) * 2;
 var
   E: PPosixProcEntry;
 begin
@@ -262,8 +274,8 @@ begin
   M := FRegExp.Match(Line);
   if (not M.Success) then
     Exit(false);
-  Entry.RangeStart := StrToInt('$' + M.Groups[1].Value);
-  Entry.RangeEnd := StrToInt('$' + M.Groups[2].Value);
+  Entry.RangeStart := StrToPosixProcInt('$' + M.Groups[1].Value);
+  Entry.RangeEnd := StrToPosixProcInt('$' + M.Groups[2].Value);
 
   s := M.Groups[3].Value.ToLower;
   Entry.Perms := [];
@@ -280,6 +292,23 @@ begin
 
   Entry.Path := M.Groups[4].Value;
   Result := true;
+end;
+
+class function TPosixProcEntryList.StrToPosixProcInt(
+  const s: string): PosixProcInt;
+
+  procedure ConvertError(const s: string);
+  begin
+    raise EConvertError.CreateResFmt(@SInvalidInteger, [s]);
+  end;
+
+var
+  err: Integer;
+begin
+  // This should work for any integer width.
+  Val(s, Result, err);
+  if err <> 0 then
+    ConvertError(s);
 end;
 
 {$ENDREGION}
