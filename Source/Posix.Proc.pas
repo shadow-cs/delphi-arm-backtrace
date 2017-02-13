@@ -23,12 +23,16 @@ uses
   System.Classes,
   System.Generics.Defaults,
   System.Generics.Collections,
+  System.SysConst,
 {$IFDEF MACOS}
+  Posix.Unistd,
   Macapi.CoreFoundation,
+  Posix.Libc,
 {$ENDIF}
   System.RegularExpressions;
 
 type
+  TPosixProcFormat = (ppfProc, ppfVmmap);
   TPosixProcEntryPermissions = set of (peRead, peWrite, peExecute, peShared,
     pePrivate {copy on write});
 
@@ -41,12 +45,15 @@ type
   PPosixProcEntry = ^TPosixProcEntry;
 
   TPosixProcEntryList = class
+  private const
+    DefaultFormat = {$IFDEF MACOS}ppfVmmap{$ELSE}ppfProc{$ENDIF};
   private type
     TPosixProcEntryComparer = class(TInterfacedObject, IComparer<TPosixProcEntry>)
     public
       function Compare(const Left, Right: TPosixProcEntry): Integer;
     end;
   private
+    FFormat: TPosixProcFormat;
     // Use only local instances for thread safety
     FComparer: IComparer<TPosixProcEntry>;
     FRegExp: TRegEx;
@@ -54,7 +61,7 @@ type
   protected
     function ProcessLine(const Line : string; out Entry : TPosixProcEntry) : Boolean;
   public
-    constructor Create;
+    constructor Create(Format: TPosixProcFormat = DefaultFormat);
     procedure LoadFromStrings(const Str : TStrings);
 {$IFDEF POSIX}
     /// <summary>
@@ -89,6 +96,32 @@ implementation
 
 {$IFDEF POSIX}
 procedure LoadProcMaps(const Maps : TStrings);
+{$IFDEF MACOS}
+var
+  buff: array[0..255] of Byte;
+  cmd: UTF8String;
+  pipe: PFile;
+  s: string;
+begin
+  cmd:='vmmap -interleaved ' + UTF8String(getpid.ToString);
+  pipe:=popen(MarshaledAString(cmd), 'r');
+  if pipe = nil then
+    raise Exception.Create('Cannot open pipe');
+  try
+    while not feof(pipe) do
+    begin
+      s := s + string(fgets(@buff[0], sizeof(buff), pipe));
+      if (s <> '') and (s[Length(s)] = sLineBreak) then
+      begin
+        Maps.Add(Copy(s, 1, Length(s) - 1));
+        s := '';
+      end;
+    end;
+  finally
+    pclose(pipe);
+  end;
+end;
+{$ELSE MACOS}
 var
   st: TFileStream;
   b: TBytes;
@@ -104,7 +137,8 @@ begin
   until (i < Length(b));
   Maps.Text := s;
 end;
-{$ENDIF}
+{$ENDIF MACOS}
+{$ENDIF POSIX}
 
 {$REGION 'TPosixProcEntryList'}
 
@@ -126,17 +160,25 @@ begin
   SetLength(Result, Length(Result) - Length(sLineBreak));
 end;
 
-constructor TPosixProcEntryList.Create;
-// Format: address perms offset dev inode pathname
-const REG_EXP =
+constructor TPosixProcEntryList.Create(Format: TPosixProcFormat);
+const REG_EXP : array[TPosixProcFormat] of string = (
+  // proc
+  // Format: address perms offset dev inode pathname
   // Start          -       End      Perms        Offset
   '^ *([0-9a-fA-F]+)-([0-9a-fA-F]+) +([rwxps\-]+) +[0-9a-fA-F]+ +' +
   // Dev                      Inode          Path
-  '[0-9a-fA-F]+:[0-9a-fA-F]+ +[0-9a-fA-F]+ *(.*)$';
+  '[0-9a-fA-F]+:[0-9a-fA-F]+ +[0-9a-fA-F]+ *(.*)$',
+  // vmmap
+  // Format: __NAME start-end [size] perms_current/perms_max SM=share  pathname
+  // Name Start      -      End           Size     Perms Current/Perms max
+  '^.* ([0-9a-fA-F]+)-([0-9a-fA-F]+) +\[[ 0-9]+\w?\] +([rwx\-]+)/[rwx\-]+ +' +
+  // Share    Path
+  'SM=[^ ]+ *(.*)$');
 begin
-  inherited;
+  inherited Create;
+  FFormat := Format;
   FComparer := TPosixProcEntryComparer.Create;
-  FRegExp := TRegEx.Create(REG_EXP);
+  FRegExp := TRegEx.Create(REG_EXP[Format]);
 end;
 
 function TPosixProcEntryList.FindEntry(
@@ -145,6 +187,9 @@ var
   Token: TPosixProcEntry;
   Index: Integer;
 begin
+  if not Assigned(FList) then
+    Exit(nil);
+
   Token.RangeEnd := Address;
   // This will most likely return false all the time since we won't have address
   // at the end of range
@@ -179,9 +224,16 @@ procedure TPosixProcEntryList.LoadFromCurrentProcess;
 var
   s: TStrings;
 begin
+  if FFormat <> DefaultFormat then
+    raise Exception.Create('Format not supported by platform');
+
   s := TStringList.Create;
-  LoadProcMaps(s);
-  LoadFromStrings(s);
+  try
+    LoadProcMaps(s);
+    LoadFromStrings(s);
+  finally
+    s.Free;
+  end;
 end;
 
 {$ENDIF}
