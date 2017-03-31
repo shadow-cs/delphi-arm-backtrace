@@ -21,4 +21,4 @@ call ..\..\Source\compile.bat
 
 ::Then use these symbols as a map, we could also load the so itself but this
 ::better demonstrates how to preserve symbols only - for release purposes
-%TOOLS_PREFIX%addr2line -f -p
+%TOOLS_PREFIX%addr2line -f -s -C -p
