@@ -5,4 +5,9 @@
   "license_file": "License.txt",
   "platforms": "Win32;Win64;OSX32",
   "compiler_min": 22
+  "repository":{
+    "type":"bitbucket",
+    "user":"shadow_cs",
+    "name":"delphi-arm-backtrace"
+  }
 }
