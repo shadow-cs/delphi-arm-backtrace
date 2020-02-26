@@ -49,6 +49,9 @@ implementation
 
 {$IFDEF POSIX}
 uses
+  {$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+  System.SyncObjs,
+  {$ENDIF}
 	Posix.Backtrace;
 {$ELSE}
 	{$MESSAGE FATAL 'Unsupported OS'}
@@ -61,6 +64,10 @@ threadvar
 	//application will most likely crash anyway)
 	HandlingException : Integer;
 
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+var
+  _CS: TCriticalSection;
+{$ENDIF}
 
 { TExceptionStackInfo }
 
@@ -138,11 +145,18 @@ var Res	: PPointer;
 	i	: Integer;
 {$ENDIF}
 begin
-	//TODO threadsafe
 {$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+	//threadsafety
 	if (FProcEntries = nil) then begin
-		FProcEntries:=TPosixProcEntryList.Create;
-		FProcEntries.LoadFromCurrentProcess;
+    _CS.Enter;
+    try
+    	if (FProcEntries = nil) then begin
+        FProcEntries:=TPosixProcEntryList.Create;
+        FProcEntries.LoadFromCurrentProcess;
+      end;
+    finally
+      _CS.Leave;
+    end;
 	end;
 	Result:=FProcEntries.ConvertStackTrace(Stack, STACK_SKIP,
 		Count - STACK_SKIP);
@@ -163,5 +177,12 @@ begin
 	{$MESSAGE FATAL 'Unsupported OS'}
 {$ENDIF}
 end;
+
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+initialization
+  _CS := TCriticalSection.Create;
+finalization
+  FreeAndNil(_CS);
+{$ENDIF}
 
 end.
