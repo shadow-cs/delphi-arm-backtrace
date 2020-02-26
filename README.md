@@ -5,7 +5,7 @@ This is a repository clone of the Delphi ARM Backtrace library for Delphinus-Sup
 - original repository https://bitbucket.org/shadow_cs/delphi-arm-backtrace
 
 This is a simple library that allows you to create a stack trace and transform
-it into format that can be fed to addr2line to convert it to function/line no.
+it into format that can be fed to `addr2line` to convert it to function/line no.
 information.
 
 Usage
@@ -13,36 +13,30 @@ Usage
 Add the functions to your project and add compile.bat from sources to your
 pre-build events. (Make sure compile.bat can find your NDK.)
 
-Create a back trace by one of the functions from Posix.Backtrace and translate
-it to symbol addresses using TPosixProcEntryList.
+Create a back trace by one of the functions from `Posix.Backtrace` and translate
+it to symbol addresses using `TPosixProcEntryList`.
 
-Feed the generated lines to addr2line to get symbolic function names and line
-information. (See PrintLines.bat how to do that.)
+Feed the generated lines to `addr2line` to get symbolic function names and line
+information. (See `PrintLines.bat` how to do that.)
 
 The result will look like this:
 
-	0x00AC5AC6 (0x75A48AC6) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN13Backtracetest9SomeFunc2Ei at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:57
-	0x00AC5E90 (0x75A48E90) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN13Backtracetest9SomeFunc1Ei at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:92
-	0x00AC5EA8 (0x75A48EA8) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN13Backtracetest4TObj4TestEv at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:118
-	0x00AC5EC0 (0x75A48EC0) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN13Backtracetest5TObj24TestEv at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:111
-	0x00AC5A60 (0x75A48A60) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN13Backtracetest9TTestForm12cmdTestClickEPN6System7TObjectE at D:\Documents\RAD Studio\Projects\ArmBacktrace\Tests/BacktraceTest.pas:125
-	0x009EF360 (0x75972360) /data/app-lib/com.embarcadero.BacktraceTestProj-1/libBacktraceTestProj.so
-	_ZN3Fmx8Controls8TControl5ClickEv at C:\Builds\TP\runtime\fmx/FMX.Controls.pas:3455
-	0x000022E9 (0x400B52E9) {Not executable} /system/lib/libc.so
-	??
-	??:0
+```
+0x001FC9BE (0xC972A9BE) /data/app/com.embarcadero.TestProject-2/lib/arm/libTestProject.so
+System::_GetMem(NativeInt) at System.pas:4588
+0x001F60F8 (0xC97240F8) /data/app/com.embarcadero.TestProject-2/lib/arm/libTestProject.so
+System::TObject::NewInstance() at System.pas:16452
+0x001FDAE0 (0xC972BAE0) /data/app/com.embarcadero.TestProject-2/lib/arm/libTestProject.so
+System::_ClassCreate(void*, signed char) at System.pas:17777
+0x001F61DA (0xC97241DA) /data/app/com.embarcadero.TestProject-2/lib/arm/libTestProject.so
+System::TObject::TObject() at System.pas:16516
+```
 
 Known issues
 ------------
  * There are no unit tests right now as this project is currently in proof of
    concept state.
- * Only tested on Android (Nexus 7, let me know if it works on your device),
-   no iOS support right now (patches welcome ;-) ).
+ * Tested on Android, MacOS, Linux no iOS support right now (patches welcome ;-) ).
 
 TODO
 ----

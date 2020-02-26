@@ -220,6 +220,17 @@ begin
   if (E = nil) then
     Exit('0x' + IntToHex(Address, CHARS) + '            ' + ' {Unknown address}');
 
+  {$IFDEF Linux64}
+  // just provide virtual addresses not subtracted from range - that confuses addr2line
+  if (peExecute in E^.Perms) then
+    Result :=
+      '0x' + IntToHex(Address, CHARS) +
+      ' ' + E^.Path
+  else
+    Result :=
+      '0x' + IntToHex(Address, CHARS) +
+      ' {Not executable} ' + E^.Path;
+  {$ELSE}
   if (peExecute in E^.Perms) then
     Result := '0x' + IntToHex(Address - E^.RangeStart, CHARS) +
       ' (0x' + IntToHex(Address, CHARS)+ ')' +
@@ -228,6 +239,7 @@ begin
     Result := '0x' + IntToHex(Address - E^.RangeStart, CHARS) +
       ' (0x' + IntToHex(Address, CHARS)+ ')' +
       ' {Not executable} ' + E^.Path;
+  {$ENDIF}
 end;
 
 {$IFDEF POSIX}

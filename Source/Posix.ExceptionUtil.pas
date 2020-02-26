@@ -29,7 +29,7 @@ type
 		STACK_DEPTH = 32;
 		STACK_ALL	= STACK_SKIP + STACK_DEPTH;
 	private class var
-{$IF Defined(ANDROID) OR Defined(IOS)}
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
 		FProcEntries	: TPosixProcEntryList;
 {$ENDIF}
 	private
@@ -49,6 +49,9 @@ implementation
 
 {$IFDEF POSIX}
 uses
+  {$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+  System.SyncObjs,
+  {$ENDIF}
 	Posix.Backtrace;
 {$ELSE}
 	{$MESSAGE FATAL 'Unsupported OS'}
@@ -61,6 +64,10 @@ threadvar
 	//application will most likely crash anyway)
 	HandlingException : Integer;
 
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+var
+  _CS: TCriticalSection;
+{$ENDIF}
 
 { TExceptionStackInfo }
 
@@ -98,7 +105,7 @@ begin
 		//0x14 bytes which is compiler dependant value
 		Info^.Count:=backtrace2(b + $14, @Info^.Stack, STACK_ALL);
 {$ELSE}
-		Info^.Count:=StackWalk(@Info^.Stack, STACK_ALL);
+		Info^.Count:=StackWalk(@Info^.Stack, STACK_ALL, 0);
 {$ENDIF}
 	except
 		//Shouldn't happen but still we'll rather have a small leak then stop
@@ -132,17 +139,24 @@ end;
 
 class function TExceptionStackInfo.GetSymbols(Stack: PPointer;
   Count: Integer): string;
-{$IF Defined(MACOS) AND NOT Defined(IOS)}
+{$IF Defined(MACOS) AND NOT Defined(IOS) OR Defined(Linux64)}
 var Res	: PPointer;
 	P	: PPointer;
 	i	: Integer;
 {$ENDIF}
 begin
-{$IF Defined(ANDROID) OR Defined(IOS)}
-	//TODO threadsafe
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+	//threadsafety
 	if (FProcEntries = nil) then begin
-		FProcEntries:=TPosixProcEntryList.Create;
-		FProcEntries.LoadFromCurrentProcess;
+    _CS.Enter;
+    try
+    	if (FProcEntries = nil) then begin
+        FProcEntries:=TPosixProcEntryList.Create;
+        FProcEntries.LoadFromCurrentProcess;
+      end;
+    finally
+      _CS.Leave;
+    end;
 	end;
 	Result:=FProcEntries.ConvertStackTrace(Stack, STACK_SKIP,
 		Count - STACK_SKIP);
@@ -163,5 +177,12 @@ begin
 	{$MESSAGE FATAL 'Unsupported OS'}
 {$ENDIF}
 end;
+
+{$IF Defined(ANDROID) OR Defined(IOS) OR Defined(Linux64)}
+initialization
+  _CS := TCriticalSection.Create;
+finalization
+  FreeAndNil(_CS);
+{$ENDIF}
 
 end.
